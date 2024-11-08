@@ -6,4 +6,14 @@ const withPWA = require('next-pwa')({
 
 module.exports = withPWA({
   reactStrictMode: true,
+
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/home',
+        permanent: true, // Permanent redirect (301 status code)
+      },
+    ];
+  },
 });
