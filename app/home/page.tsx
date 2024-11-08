@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Bar } from 'react-chartjs-2'; // Import Bar chart
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,9 +27,8 @@ interface SensorData {
   humidity_th22: number;
   altitude_bmp180: number;
   pressure_bmp180: number;
-  temperature_th22: number;
-  temperature_bmp180: number;
-  temperature_internal: number;
+  temperature: number;
+
 }
 
 // Sample data generator (simulates one sensor data at a time)
@@ -39,9 +38,8 @@ const generateSampleData = () => ({
   humidity_th22: Math.floor(Math.random() * 100),
   altitude_bmp180: Math.floor(Math.random() * 100),
   pressure_bmp180: Math.floor(Math.random() * 100),
-  temperature_th22: Math.floor(Math.random() * 100),
-  temperature_bmp180: Math.floor(Math.random() * 100),
-  temperature_internal: Math.floor(Math.random() * 100),
+  temperature: Math.floor(Math.random() * 100),
+
 });
 
 export default function HomePage() {
@@ -53,7 +51,7 @@ export default function HomePage() {
       Notification.requestPermission();
     }
 
-    // Update the sample data every 2 seconds with one new sensor data point
+    // Update the sample data every 10 seconds
     const intervalId = setInterval(() => {
       const newData = generateSampleData();
       setData(newData);
@@ -64,17 +62,17 @@ export default function HomePage() {
         newData.humidity_th22 > 80 ||
         newData.altitude_bmp180 > 80 ||
         newData.pressure_bmp180 > 80 ||
-        newData.temperature_th22 > 80 ||
-        newData.temperature_bmp180 > 80 ||
-        newData.temperature_internal > 80
+        newData.temperature > 80
       ) {
         // Show a notification when any value exceeds 80
-        new Notification("Danger", {
-          body: `Sensor value exceeded threshold!`,
-          icon: '/path/to/icon.png', // You can add an icon if desired
-        });
+        if (Notification.permission === "granted") {
+          new Notification("Danger", {
+            body: `A sensor value exceeded the threshold!`,
+            icon: '/path/to/icon.png', // Add a path to an icon if desired
+          });
+        }
       }
-    }, 10000); // Update every 10 seconds
+    }, 10000);
 
     return () => clearInterval(intervalId); // Cleanup on component unmount
   }, []);
@@ -85,7 +83,7 @@ export default function HomePage() {
     datasets: [
       {
         label: 'Gas MQ9B',
-        data: [data.gas_mq9b], // Only one data point per chart update
+        data: [data.gas_mq9b],
         backgroundColor: 'rgba(255, 99, 132, 1)',
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 1,
@@ -112,52 +110,44 @@ export default function HomePage() {
         borderWidth: 1,
       },
       {
-        label: 'Temperature TH22',
-        data: [data.temperature_th22],
+        label: 'Temperature',
+        data: [data.temperature],
         backgroundColor: 'rgba(255, 159, 64, 1)',
         borderColor: 'rgba(255, 159, 64, 1)',
         borderWidth: 1,
       },
-      {
-        label: 'Temperature BMP180',
-        data: [data.temperature_bmp180],
-        backgroundColor: 'rgba(255, 205, 86, 1)',
-        borderColor: 'rgba(255, 205, 86, 1)',
-        borderWidth: 1,
-      },
-      {
-        label: 'Internal Temperature',
-        data: [data.temperature_internal],
-        backgroundColor: 'rgba(201, 203, 207, 1)',
-        borderColor: 'rgba(201, 203, 207, 1)',
-        borderWidth: 1,
-      },
+
     ],
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right' as const,
+        position: 'bottom' as const,
         labels: {
           font: {
-            size: 28,  // Increase the font size of the legend
+            size: 8, // Reduce font size for mobile devices
           },
         },
       },
       title: {
         display: true,
-        text: 'Simulated ESP32 Sensor Data (One Sensor Every 2 Sec)',
+        text: 'Simulated ESP32 Sensor Data',
+        font: {
+          size: 18,
+        },
       },
     },
-    // No stacked bars needed since you are displaying one set of data each time
   };
 
   return (
-    <div>
+    <div style={{ padding: '20px', maxWidth: '100%', boxSizing: 'border-box' }}>
       <h1>ESP32 Sensor Data (Simulated)</h1>
-      <Bar data={chartData} options={chartOptions} />
+      <div style={{ width: '100%', height: '400px', maxWidth: '600px', margin: '0 auto' }}>
+        <Bar data={chartData} options={chartOptions} />
+      </div>
     </div>
   );
 }
