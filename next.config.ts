@@ -6,7 +6,7 @@ const withPWA = require('next-pwa')({
   skipWaiting: true,
   runtimeCaching: [
     {
-      urlPattern: /^https?:\/\/192\.168\.0\.1\/sensors/,
+      urlPattern: /^http?:\/\/192\.168\.0\.1\/sensors/,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'esp32-data',
@@ -21,7 +21,7 @@ const withPWA = require('next-pwa')({
       },
     },
     {
-      urlPattern: /^https?.*/,
+      urlPattern: /^http?.*/,
       handler: 'CacheFirst',
       options: {
         cacheName: 'offlineCache',
