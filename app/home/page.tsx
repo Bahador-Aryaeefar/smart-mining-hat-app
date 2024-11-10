@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 
 import { FiMenu } from 'react-icons/fi'; // Import menu icon from react-icons
+import useServiceWorker from '@/hooks/useServiceWorker';
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
@@ -26,6 +27,8 @@ interface SensorData {
 }
 
 function HomePage() {
+  useServiceWorker();
+
   const [data, setData] = useState<SensorData | null>(null);
 
   // State to store user-defined limits for each parameter (default to null)
